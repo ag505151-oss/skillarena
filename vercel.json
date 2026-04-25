@@ -1,0 +1,7 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "pnpm --filter @skillarena/db build && pnpm --filter @skillarena/types build && pnpm --filter @skillarena/web build",
+  "installCommand": "pnpm install",
+  "outputDirectory": "apps/web/.next",
+  "ignoreCommand": "git diff HEAD^ HEAD --quiet -- apps/web/ packages/"
+}
