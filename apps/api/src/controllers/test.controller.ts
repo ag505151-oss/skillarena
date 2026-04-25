@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { z } from 'zod';
-import type { Prisma } from '@prisma/client';
+import type { Prisma, Option } from '@skillarena/db';
 
 import { prisma } from '@skillarena/db';
 
@@ -231,7 +231,10 @@ export async function submitAttempt(req: Request, res: Response): Promise<void> 
     }
 
     let score = 0;
-    const questionMap = new Map(attempt.test.questions.map((question: typeof attempt.test.questions[number]) => [question.id, question]));
+    type QuestionWithOptions = { id: string; marks: number; options: Option[] };
+    const questionMap = new Map<string, QuestionWithOptions>(
+      (attempt.test.questions as QuestionWithOptions[]).map((q) => [q.id, q])
+    );
 
     await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       for (const answer of attempt.answers) {
@@ -240,7 +243,7 @@ export async function submitAttempt(req: Request, res: Response): Promise<void> 
           continue;
         }
 
-        const correctOption = question.options.find((option) => option.isCorrect);
+        const correctOption = question.options.find((option: Option) => option.isCorrect);
         const isCorrect = Boolean(correctOption && answer.selectedOption === correctOption.id);
         const marksAwarded = isCorrect
           ? question.marks
