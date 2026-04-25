@@ -21,7 +21,8 @@ export interface UserData {
   stripeCustomerId?: string | null;
   provider?: string | null;
   twoFactorEnabled: boolean;
-  notificationPrefs?: Record<string, boolean> | null;
+  notificationPrefs?: Record<string, boolean | string> | null;
+  digestFrequency?: 'immediately' | 'daily' | 'weekly' | null;
   editorPrefs?: {
     theme?: string;
     fontSize?: number;

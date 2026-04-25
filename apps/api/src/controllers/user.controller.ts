@@ -39,7 +39,7 @@ const passwordSchema = z.object({
 });
 
 const preferencesSchema = z.object({
-  notificationPrefs: z.record(z.boolean()).optional(),
+  notificationPrefs: z.record(z.union([z.boolean(), z.string()])).optional(),
   editorPrefs: z.object({
     theme: z.string().optional(),
     fontSize: z.number().min(12).max(20).optional(),

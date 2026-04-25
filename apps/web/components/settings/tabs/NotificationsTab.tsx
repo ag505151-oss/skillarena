@@ -54,8 +54,16 @@ type Prefs = Record<string, boolean>;
 function buildDefaults(): Prefs {
   const prefs: Prefs = {};
   [...EMAIL_GROUPS, ...INAPP_GROUPS].forEach((g) => g.items.forEach((item) => { prefs[item.key] = true; }));
-  prefs['digest_frequency'] = true;
   return prefs;
+}
+
+/** Strip non-boolean keys (e.g. digest_frequency) before using as toggle prefs */
+function toBooleanPrefs(raw: Record<string, boolean | string>): Prefs {
+  const out: Prefs = {};
+  for (const [k, v] of Object.entries(raw)) {
+    if (typeof v === 'boolean') out[k] = v;
+  }
+  return out;
 }
 
 import type { UserData } from '@/types/settings';
@@ -63,14 +71,14 @@ import type { UserData } from '@/types/settings';
 interface Props { userData: UserData | null; apiToken: string; onSaved: () => void }
 
 export function NotificationsTab({ userData, apiToken, onSaved }: Props) {
-  const stored = (userData?.notificationPrefs ?? {}) as Prefs;
+  const rawStored = userData?.notificationPrefs ?? {};
+  const stored = toBooleanPrefs(rawStored);
   const defaults = buildDefaults();
   const [prefs, setPrefs] = useState<Prefs>({ ...defaults, ...stored });
-  const [digest, setDigest] = useState<'immediately' | 'daily' | 'weekly'>(() => {
-    const freq = stored['digest_frequency'];
-    if (freq === 'daily' || freq === 'weekly') return freq;
-    return 'immediately';
-  });
+  const storedFreq = rawStored['digest_frequency'];
+  const [digest, setDigest] = useState<'immediately' | 'daily' | 'weekly'>(
+    storedFreq === 'daily' || storedFreq === 'weekly' ? storedFreq : 'immediately'
+  );
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
