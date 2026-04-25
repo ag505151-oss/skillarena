@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { z } from 'zod';
+import type { Prisma } from '@prisma/client';
 
 import { prisma } from '@skillarena/db';
 
@@ -171,7 +172,7 @@ export async function saveAttempt(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       for (const answer of parsed.data.answers) {
         await tx.answer.upsert({
           where: {
@@ -230,9 +231,9 @@ export async function submitAttempt(req: Request, res: Response): Promise<void> 
     }
 
     let score = 0;
-    const questionMap = new Map(attempt.test.questions.map((question) => [question.id, question]));
+    const questionMap = new Map(attempt.test.questions.map((question: typeof attempt.test.questions[number]) => [question.id, question]));
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       for (const answer of attempt.answers) {
         const question = questionMap.get(answer.testQuestionId);
         if (!question) {
@@ -305,7 +306,7 @@ export async function getResult(req: Request, res: Response): Promise<void> {
       select: { id: true, score: true },
       orderBy: [{ score: 'desc' }, { submittedAt: 'asc' }],
     });
-    const rank = attempts.findIndex((item) => item.id === attempt.id) + 1;
+    const rank = attempts.findIndex((item: { id: string; score: number | null }) => item.id === attempt.id) + 1;
     const percentile = computePercentile(rank, attempts.length);
 
     res.json(

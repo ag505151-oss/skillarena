@@ -228,7 +228,7 @@ export async function getHackathonLeaderboard(req: Request, res: Response): Prom
       take: 100,
     });
 
-    const ranked = leaderboard.map((entry, index) => ({
+    const ranked = leaderboard.map((entry, index: number) => ({
       ...entry,
       rank: index + 1,
     }));
