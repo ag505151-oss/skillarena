@@ -1,0 +1,366 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                        String         @id @default(cuid())
+  name                      String
+  email                     String         @unique
+  password                  String?
+  avatar                    String?
+  bio                       String?
+  skills                    String[]
+  resumeUrl                 String?
+  resumeUploadedAt          DateTime?
+  username                  String?        @unique
+  location                  String?
+  website                   String?
+  githubUrl                 String?
+  linkedinUrl               String?
+  twitterHandle             String?
+  phone                     String?
+  dateOfBirth               DateTime?
+  role                      Role           @default(CANDIDATE)
+  plan                      UserPlan       @default(FREE)
+  planExpiresAt             DateTime?
+  stripeCustomerId          String?
+  provider                  String?
+  providerId                String?
+  twoFactorEnabled          Boolean        @default(false)
+  notificationPrefs         Json?
+  editorPrefs               Json?
+  createdAt                 DateTime       @default(now())
+  updatedAt                 DateTime       @updatedAt
+  interviewsAsCandidate     Interview[]    @relation("Candidate")
+  interviewsAsInterviewer   Interview[]    @relation("Interviewer")
+  feedbackGiven             Feedback[]
+  hackathonParticipants     Participant[]
+  testAttempts              Attempt[]
+  notifications             Notification[]
+  sessions                  UserSession[]
+}
+
+model UserSession {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device     String
+  browser    String
+  location   String?
+  ipAddress  String?
+  lastActive DateTime @default(now())
+  createdAt  DateTime @default(now())
+}
+
+enum UserPlan {
+  FREE
+  PRO
+  LIFETIME
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  INTERVIEWER
+  CANDIDATE
+}
+
+model Interview {
+  id            String            @id @default(cuid())
+  title         String
+  scheduledAt   DateTime
+  duration      Int
+  status        InterviewStatus   @default(SCHEDULED)
+  roomId        String            @unique
+  codeSnapshot  String?
+  recordingUrl  String?
+  notes         String?
+  candidateId   String
+  interviewerId String
+  candidate     User              @relation("Candidate", fields: [candidateId], references: [id])
+  interviewer   User              @relation("Interviewer", fields: [interviewerId], references: [id])
+  feedback      Feedback?
+  questions     InterviewQuestion[]
+  createdAt     DateTime          @default(now())
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  LIVE
+  COMPLETED
+  CANCELLED
+}
+
+model Feedback {
+  id             String    @id @default(cuid())
+  interviewId    String    @unique
+  interview      Interview @relation(fields: [interviewId], references: [id])
+  authorId       String
+  author         User      @relation(fields: [authorId], references: [id])
+  problemSolving Int
+  communication  Int
+  codeQuality    Int
+  cultureFit     Int
+  comments       String?
+  createdAt      DateTime  @default(now())
+}
+
+model Question {
+  id                 String              @id @default(cuid())
+  title              String
+  description        String
+  category           QuestionCategory
+  difficulty         Difficulty
+  tags               String[]
+  createdAt          DateTime            @default(now())
+  interviewQuestions InterviewQuestion[]
+  hackathonProblems  Problem[]
+  testQuestions      TestQuestion[]
+}
+
+enum QuestionCategory {
+  DSA
+  SYSTEM_DESIGN
+  BEHAVIOURAL
+  HR
+  APTITUDE
+  LOGICAL
+  VERBAL
+  CODING
+  DBMS
+  OS
+  NETWORKS
+  ML
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model InterviewQuestion {
+  id          String    @id @default(cuid())
+  interviewId String
+  questionId  String
+  interview   Interview @relation(fields: [interviewId], references: [id])
+  question    Question  @relation(fields: [questionId], references: [id])
+}
+
+model Hackathon {
+  id              String            @id @default(cuid())
+  title           String
+  description     String
+  startAt         DateTime
+  endAt           DateTime
+  maxTeamSize     Int               @default(1)
+  maxParticipants Int?
+  prizeDetails    String?
+  allowedLangs    String[]
+  status          HackathonStatus   @default(UPCOMING)
+  isTeamMode      Boolean           @default(false)
+  entryFee        Float             @default(0)
+  createdAt       DateTime          @default(now())
+  problems        Problem[]
+  participants    Participant[]
+  teams           Team[]
+  leaderboard     LeaderboardEntry[]
+}
+
+enum HackathonStatus {
+  UPCOMING
+  LIVE
+  ENDED
+}
+
+model Problem {
+  id          String       @id @default(cuid())
+  hackathonId String
+  hackathon   Hackathon    @relation(fields: [hackathonId], references: [id])
+  questionId  String
+  question    Question     @relation(fields: [questionId], references: [id])
+  points      Int          @default(100)
+  testCases   TestCase[]
+  submissions Submission[]
+}
+
+model TestCase {
+  id        String  @id @default(cuid())
+  problemId String
+  problem   Problem @relation(fields: [problemId], references: [id])
+  input     String
+  output    String
+  isSample  Boolean @default(false)
+}
+
+model Participant {
+  id           String    @id @default(cuid())
+  hackathonId  String
+  userId       String
+  teamId       String?
+  hackathon    Hackathon @relation(fields: [hackathonId], references: [id])
+  user         User      @relation(fields: [userId], references: [id])
+  team         Team?     @relation(fields: [teamId], references: [id])
+  registeredAt DateTime  @default(now())
+}
+
+model Team {
+  id          String             @id @default(cuid())
+  hackathonId String
+  name        String
+  hackathon   Hackathon          @relation(fields: [hackathonId], references: [id])
+  members     Participant[]
+  submissions Submission[]
+  leaderboard LeaderboardEntry[]
+}
+
+model Submission {
+  id         String           @id @default(cuid())
+  problemId  String
+  teamId     String?
+  userId     String?
+  language   String
+  code       String
+  status     SubmissionStatus
+  score      Int              @default(0)
+  timeTaken  Float?
+  memoryUsed Float?
+  judgeToken String?
+  problem    Problem          @relation(fields: [problemId], references: [id])
+  team       Team?            @relation(fields: [teamId], references: [id])
+  submittedAt DateTime        @default(now())
+}
+
+enum SubmissionStatus {
+  PENDING
+  ACCEPTED
+  WRONG_ANSWER
+  TIME_LIMIT_EXCEEDED
+  RUNTIME_ERROR
+  COMPILE_ERROR
+}
+
+model LeaderboardEntry {
+  id          String    @id @default(cuid())
+  hackathonId String
+  teamId      String?
+  userId      String?
+  rank        Int
+  score       Int
+  solvedCount Int
+  lastSubmit  DateTime
+  hackathon   Hackathon @relation(fields: [hackathonId], references: [id])
+  team        Team?     @relation(fields: [teamId], references: [id])
+}
+
+model Test {
+  id            String         @id @default(cuid())
+  title         String
+  description   String
+  category      QuestionCategory
+  duration      Int
+  totalMarks    Int
+  passingScore  Int
+  negativeMarks Float          @default(0)
+  shuffle       Boolean        @default(false)
+  visibility    TestVisibility @default(PUBLIC)
+  accessCode    String?
+  scheduledAt   DateTime?
+  createdAt     DateTime       @default(now())
+  questions     TestQuestion[]
+  attempts      Attempt[]
+}
+
+enum TestVisibility {
+  PUBLIC
+  PRIVATE
+  SCHEDULED
+}
+
+model TestQuestion {
+  id         String   @id @default(cuid())
+  testId     String
+  questionId String
+  marks      Int      @default(1)
+  order      Int
+  test       Test     @relation(fields: [testId], references: [id])
+  question   Question @relation(fields: [questionId], references: [id])
+  options    Option[]
+  answers    Answer[]
+}
+
+model Option {
+  id             String       @id @default(cuid())
+  testQuestionId String
+  text           String
+  isCorrect      Boolean      @default(false)
+  testQuestion   TestQuestion @relation(fields: [testQuestionId], references: [id])
+}
+
+model Attempt {
+  id          String        @id @default(cuid())
+  testId      String
+  userId      String
+  startedAt   DateTime      @default(now())
+  submittedAt DateTime?
+  score       Int?
+  percentile  Float?
+  timeTaken   Int?
+  status      AttemptStatus @default(IN_PROGRESS)
+  test        Test          @relation(fields: [testId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+  answers     Answer[]
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  EVALUATED
+}
+
+model Answer {
+  id             String       @id @default(cuid())
+  attemptId      String
+  testQuestionId String
+  selectedOption String?
+  codeAnswer     String?
+  isCorrect      Boolean?
+  marksAwarded   Float?
+  attempt        Attempt      @relation(fields: [attemptId], references: [id])
+  testQuestion   TestQuestion @relation(fields: [testQuestionId], references: [id])
+
+  @@unique([attemptId, testQuestionId])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  link      String?
+  user      User             @relation(fields: [userId], references: [id])
+  createdAt DateTime         @default(now())
+}
+
+enum NotificationType {
+  INTERVIEW
+  HACKATHON
+  TEST
+  SYSTEM
+}
+
+model Certificate {
+  id          String   @id @default(cuid())
+  userId      String
+  hackathonId String
+  rank        Int
+  pdfUrl      String
+  issuedAt    DateTime @default(now())
+}

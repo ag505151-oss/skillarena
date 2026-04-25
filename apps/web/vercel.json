@@ -1,0 +1,11 @@
+{
+  "framework": "nextjs",
+  "installCommand": "cd ../.. && ./pnpm install --config.store-dir=.pnpm-store-local --config.package-import-method=copy",
+  "buildCommand": "cd ../.. && ./pnpm --filter @skillarena/web run build",
+  "outputDirectory": ".next",
+  "env": {
+    "NEXTAUTH_URL": "@nextauth_url",
+    "NEXTAUTH_SECRET": "@nextauth_secret",
+    "NEXT_PUBLIC_API_BASE_URL": "@next_public_api_base_url"
+  }
+}
