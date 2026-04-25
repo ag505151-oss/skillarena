@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Check, Loader2, Monitor, Smartphone, Globe } from 'lucide-react';
+import { Eye, EyeOff, Check, Loader2, Monitor, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -29,7 +29,7 @@ function passwordStrength(pw: string): { label: string; color: string; width: st
   return map[score] ?? map[0]!;
 }
 
-export function AccountTab({ userData, apiToken, onDirty, onSaved }: Props) {
+export function AccountTab({ userData, apiToken, onDirty: _onDirty, onSaved: _onSaved }: Props) {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [newEmail, setNewEmail] = useState('');

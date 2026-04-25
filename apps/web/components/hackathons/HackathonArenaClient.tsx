@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Trophy, Play, Send, CheckCircle, XCircle } from 'lucide-react';
+import { Trophy, Play, Send, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { apiSend } from '@/lib/api';
@@ -17,7 +17,7 @@ const mockProblems = [
   { id: 'p3', title: 'Binary Tree Paths', points: 200, status: 'unseen' as const },
 ];
 
-const mockLeaderboard = [
+const mockLeaderboard: { rank: number; name: string; score: number; solved: number; lastSubmit: string; isYou?: boolean }[] = [
   { rank: 1, name: 'Team Alpha', score: 250, solved: 2, lastSubmit: '5m ago' },
   { rank: 2, name: 'CodeNinjas', score: 200, solved: 2, lastSubmit: '12m ago' },
   { rank: 3, name: 'You', score: 100, solved: 1, lastSubmit: '20m ago', isYou: true },
@@ -223,7 +223,7 @@ export function HackathonArenaClient({ hackathonId }: { hackathonId: string }) {
               <thead><tr className="text-xs text-muted-foreground border-b">{['#', 'Team', 'Score', 'Solved', 'Last'].map((h) => <th key={h} className="pb-2 text-left">{h}</th>)}</tr></thead>
               <tbody>
                 {mockLeaderboard.map((row) => (
-                  <tr key={row.rank} className={cn('border-b', (row as any).isYou && 'bg-[#534AB7]/10 border-l-2 border-l-[#534AB7]')}>
+                  <tr key={row.rank} className={cn('border-b', row.isYou && 'bg-[#534AB7]/10 border-l-2 border-l-[#534AB7]')}>
                     <td className="py-2 font-bold">#{row.rank}</td>
                     <td className="py-2">{row.name}</td>
                     <td className="py-2 text-[#534AB7] font-semibold">{row.score}</td>

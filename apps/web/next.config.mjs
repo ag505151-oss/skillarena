@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+/* global process */
 const nextConfig = {
   images: {
     domains: [

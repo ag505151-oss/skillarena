@@ -22,9 +22,12 @@ export function AppearanceTab() {
   const [accent, setAccent] = useState(() =>
     typeof window !== 'undefined' ? localStorage.getItem('sa-accent') ?? '#534AB7' : '#534AB7'
   );
-  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>(() =>
-    (typeof window !== 'undefined' ? (localStorage.getItem('sa-font-size') as any) : null) ?? 'medium'
-  );
+  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>(() => {
+    if (typeof window === 'undefined') return 'medium';
+    const stored = localStorage.getItem('sa-font-size');
+    if (stored === 'small' || stored === 'large') return stored;
+    return 'medium';
+  });
   const [editorTheme, setEditorTheme] = useState(() =>
     typeof window !== 'undefined' ? localStorage.getItem('sa-editor-theme') ?? 'VS Dark' : 'VS Dark'
   );

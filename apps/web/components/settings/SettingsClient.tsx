@@ -23,7 +23,7 @@ type TabId = typeof TABS[number]['id'];
 
 interface Props { apiToken: string; userEmail: string; userName: string }
 
-export function SettingsClient({ apiToken, userEmail, userName }: Props) {
+export function SettingsClient({ apiToken, userEmail: _userEmail, userName: _userName }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>('profile');
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);

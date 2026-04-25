@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, Video, Trophy, FileText, Settings, CheckCheck, Inbox } from 'lucide-react';
+import { Video, Trophy, FileText, Settings, CheckCheck, Inbox } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from '@/lib/time';
 import { Button } from '@/components/ui/button';

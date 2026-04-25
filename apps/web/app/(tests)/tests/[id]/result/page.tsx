@@ -17,7 +17,9 @@ export default async function TestResultPage({ params, searchParams }: Props) {
   let result: TestResult | null = null;
   try {
     result = await apiGet<TestResult>(`/api/tests/${params.id}/result/${attemptId}`);
-  } catch {}
+  } catch (_e) {
+    // result stays null
+  }
 
   return <TestResultClient result={result} plan={plan} testId={params.id} />;
 }

@@ -66,9 +66,11 @@ export function NotificationsTab({ userData, apiToken, onSaved }: Props) {
   const stored = (userData?.notificationPrefs ?? {}) as Prefs;
   const defaults = buildDefaults();
   const [prefs, setPrefs] = useState<Prefs>({ ...defaults, ...stored });
-  const [digest, setDigest] = useState<'immediately' | 'daily' | 'weekly'>(
-    (stored['digest_frequency'] as any) ?? 'immediately'
-  );
+  const [digest, setDigest] = useState<'immediately' | 'daily' | 'weekly'>(() => {
+    const freq = stored['digest_frequency'];
+    if (freq === 'daily' || freq === 'weekly') return freq;
+    return 'immediately';
+  });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 

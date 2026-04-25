@@ -14,12 +14,6 @@ import { Dialog } from '@/components/ui/dialog';
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000';
 
-const PLAN_BADGE: Record<string, { label: string; variant: 'secondary' | 'purple' | 'teal' }> = {
-  FREE:     { label: 'Free',     variant: 'secondary' },
-  PRO:      { label: 'Pro',      variant: 'purple' },
-  LIFETIME: { label: 'Lifetime', variant: 'teal' },
-};
-
 const mockHistory = [
   { date: '2025-04-01', plan: 'Pro Monthly', amount: '$30.00', status: 'Paid' },
   { date: '2025-03-01', plan: 'Pro Monthly', amount: '$30.00', status: 'Paid' },
@@ -81,7 +75,6 @@ export function BillingPageClient({ apiToken }: Props) {
   }
 
   const plan = userData?.plan ?? 'FREE';
-  const planBadge = PLAN_BADGE[plan] ?? PLAN_BADGE.FREE;
 
   const usage = {
     tests:      { used: 3, limit: 3 },

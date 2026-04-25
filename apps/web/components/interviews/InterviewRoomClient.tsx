@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Clock, ChevronDown, Plus, X, Code2, Pencil, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ interface Props { interviewId: string; userRole: string }
 
 const DAILY_CO_URL = process.env.NEXT_PUBLIC_DAILY_CO_URL ?? 'https://skillarena.daily.co/demo';
 
-export function InterviewRoomClient({ interviewId, userRole }: Props) {
+export function InterviewRoomClient({ interviewId: _interviewId, userRole }: Props) {
   const [elapsed, setElapsed] = useState(0);
   const [tabWarnings, setTabWarnings] = useState(0);
   const [showWarning, setShowWarning] = useState(false);
@@ -104,7 +104,7 @@ export function InterviewRoomClient({ interviewId, userRole }: Props) {
         ] as const).map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key as any)}
+            onClick={() => setActiveTab(tab.key as 'code' | 'whiteboard' | 'notes')}
             className={cn(
               'flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors',
               activeTab === tab.key ? 'border-[#534AB7] text-[#534AB7]' : 'border-transparent text-muted-foreground hover:text-foreground',

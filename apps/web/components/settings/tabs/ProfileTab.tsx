@@ -1,12 +1,11 @@
 'use client';
 import { useState, useRef } from 'react';
 import { toast } from 'sonner';
-import { Upload, X, FileText, Eye, Trash2, Loader2, Plus } from 'lucide-react';
+import { Upload, X, FileText, Eye, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Dialog } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000';
 const CLOUDINARY_CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? '';

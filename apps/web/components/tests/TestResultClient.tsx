@@ -35,7 +35,7 @@ export function TestResultClient({ result, plan, testId: _testId }: Props) {
   const wrong = result?.attempt?.answers?.filter((a) => a.isCorrect === false).length ?? 2;
   const skipped = (result?.attempt?.answers?.length ?? 10) - correct - wrong;
 
-  const mockLeaderboard = [
+  const mockLeaderboard: { rank: number; name: string; score: number; time: string; isYou?: boolean }[] = [
     { rank: 1, name: 'Alice K', score: 95, time: '18m' },
     { rank: 2, name: 'Bob M', score: 90, time: '22m' },
     { rank: 3, name: 'Carol S', score: 88, time: '25m' },
@@ -141,7 +141,7 @@ export function TestResultClient({ result, plan, testId: _testId }: Props) {
             </thead>
             <tbody>
               {mockLeaderboard.slice(0, plan === 'FREE' ? 3 : undefined).map((row) => (
-                <tr key={row.rank} className={`border-t ${(row as any).isYou ? 'border-l-4 border-l-[#534AB7] bg-[#534AB7]/5' : ''}`}>
+                <tr key={row.rank} className={`border-t ${row.isYou ? 'border-l-4 border-l-[#534AB7] bg-[#534AB7]/5' : ''}`}>
                   <td className="px-4 py-3 font-bold">#{row.rank}</td>
                   <td className="px-4 py-3">{row.name}</td>
                   <td className="px-4 py-3 font-semibold text-[#534AB7]">{row.score}</td>
